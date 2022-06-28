@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.23.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.2.0 FATAL_ERROR)
 project(blare VERSION 0.1.0 LANGUAGES CXX C)
 
 set(BLARE_TESTS ON)
