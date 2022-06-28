@@ -1,0 +1,20 @@
+dist: trusty
+sudo: require
+language: cpp
+compiler: gcc
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-11
+      - g++-11
+      - cmake
+script:
+  # Export CC and CXX to tell cmake which compiler to use
+  - export CC=gcc-11
+  - export CXX=g++-11
+  - cmake -G "Unix Makefiles" -S . -B ./build
+  - cd ./build
+  - make
+  - ./blare
