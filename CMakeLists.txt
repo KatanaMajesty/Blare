@@ -4,14 +4,11 @@ project(blare VERSION 0.1.0 LANGUAGES CXX C)
 set(BLARE_TESTS ON)
 set(BLARE_TESTING_DIR "blare-testing")
 set(BLARE_INCLUDE_DIR "./src/${PROJECT_NAME}")
+set(BLARE_CXX_STD 20) # Use C++20
+set(BLARE_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 file(GLOB_RECURSE
 	SOURCE "./src/${PROJECT_NAME}/*.cpp"
-)
-
-add_executable(${PROJECT_NAME} ${SOURCE}) # temporary executable
-target_include_directories(${PROJECT_NAME}
-	PUBLIC ${BLARE_INCLUDE_DIR}
 )
 
 if (BLARE_TESTS)
