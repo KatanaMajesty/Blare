@@ -1,13 +1,13 @@
 #pragma once
 
-#include <concepts>
 #include <cstddef>
 #include <stdexcept>
 #include <cstring>
+#include <iostream>
 
 namespace blare
 {
-	template<typename T> class ArrayList // replace std::allocator with blare::DefaultAllocator
+	template<typename T> class ArrayList
 	{
 	public:
 		using Iterator = T*;
@@ -17,29 +17,33 @@ namespace blare
 		{ 
 			if (m_Factor < 1.0f) // for efficiency sake
 				m_Factor = 1.2f;
-			m_Data = (T*)::operator new[](m_Capacity * sizeof(T)); 
+			m_Data = (T*)operator new[](m_Capacity * sizeof(T)); 
 		}
-		ArrayList(const ArrayList& other);
-		ArrayList(ArrayList&& other);
-		ArrayList& operator=(const ArrayList& other);
-		ArrayList& operator=(ArrayList&& other);
-		~ArrayList() { delete[] m_Data; }
+		ArrayList(const ArrayList& other); // noimpl
+		ArrayList(ArrayList&& other); // noimpl
+		ArrayList& operator=(const ArrayList& other); // noimpl
+		ArrayList& operator=(ArrayList&& other); // noimpl
+		~ArrayList() 
+		{ 
+			for (T& t : *this)
+				t.~T();
+			operator delete[](m_Data, m_Capacity * sizeof(T)); 
+		}
 
 		void pushBack(const T& t)
 		{
 			if (m_Size >= m_Capacity)
-			{
 				reallocate((size_t) (m_Capacity * static_cast<float>(m_Factor) + 1.0f));
-			}
 			m_Size++;
-			back() = t;
+			new(end() - 1) T(t);
 		}
 		void pushBack(T&& t)
 		{
+			std::cout << "rval pushback\n";
 			if (m_Size >= m_Capacity) 
 				reallocate((size_t) (m_Capacity * static_cast<float>(m_Factor) + 1.0f));
 			m_Size++;
-			back() = std::move(t);
+			new(end() - 1) T(std::move(t));
 		}
 		void popBack()
 		{
@@ -69,9 +73,9 @@ namespace blare
 
 		void clear()
 		{
-			delete[] m_Data;
+			for (T& t : *this)
+				t.~T();
 			m_Size = 0;
-			m_Data = new T[m_Capacity];
 		}
 		void compress() 
 		{ 
@@ -98,14 +102,19 @@ namespace blare
 	private:
 		void reallocate(size_t capacity)
 		{
+			size_t oldCapacity = m_Capacity;
 			m_Capacity = capacity;
 			if (m_Size > m_Capacity)
 				m_Size = m_Capacity;
-			
+
 			T* data = (T*)::operator new[](m_Capacity * sizeof(T));
-			new((T*)data) T(std::move(begin(), end()));
+			for (ptrdiff_t i = 0; i < m_Size; i++)
+			{
+				new((T*)data + i) T(std::move(m_Data[i]));
+				m_Data[i].~T();
+			}
 			
-			delete[] m_Data;
+			operator delete[](m_Data, oldCapacity * sizeof(T));
 			m_Data = data;
 		}
 	private:

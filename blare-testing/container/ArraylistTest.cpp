@@ -2,20 +2,57 @@
 
 #include <vector>
 #include <iostream>
+#include <string>
 
-int main()
+class Entity
 {
-	blare::ArrayList<int> arraylist;
-	std::vector<int> vector;
+public:
+	Entity() : m_UUID("uuid"), m_Hash(rand()) {};
+	Entity& operator=(Entity&& other) 
+	{
+		m_Hash = std::move(other.m_Hash);
+		m_UUID = std::move(other.m_UUID);
+		return *this; 
+	}
+	Entity& operator=(const Entity& other) 
+	{ 
+		this->m_Hash = other.m_Hash;
+		this->m_UUID = other.m_UUID;
+		return *this; 
+	}
+	Entity(const Entity& other) : m_Hash(other.m_Hash), m_UUID(other.m_UUID) {}
+	Entity(Entity&& other) : m_Hash(other.m_Hash), m_UUID(std::move(other.m_UUID)) {}
+	~Entity() = default;
+
+	friend std::ostream& operator<<(std::ostream& stream, const Entity& entity);
+	bool operator==(const Entity& other) const { return this->m_Hash == other.m_Hash; }
+	bool operator!=(const Entity& other) const {return !(*this == other); }
+
+	std::string m_UUID;
+	size_t m_Hash;
+};
+
+
+std::ostream& operator<<(std::ostream& stream, const Entity& entity)
+{
+	stream << entity.m_Hash;
+	return stream;
+}
+
+template<typename T> int testContainer()
+{
+	blare::ArrayList<T> arraylist;
+	std::vector<T> vector;
 
 	for (size_t i = 0; i < 1'000; i++)
 	{
 		size_t randomPushBack = rand() % 10'000 + 10'000;
 		for (size_t j = 0; j < randomPushBack; j++)
 		{
-			size_t randomNum = rand() % 20'000;
-			arraylist.pushBack(randomNum);
-			vector.push_back(randomNum);
+			// size_t randomNum = rand() % 20'000;
+			Entity entity;
+			arraylist.pushBack(entity);
+			vector.push_back(entity);
 		}
 		size_t randomPopBack = rand() % 10'000 + 10'000;
 		for (size_t j = 0; j < randomPopBack; j++)
@@ -27,14 +64,14 @@ int main()
 
 	if (arraylist.size() != 0)
 	{
-		int& arraylistFront = arraylist.front();
-		int& arraylistBack = arraylist.back();
-		int arraylistSize = arraylist.size();
-		int arraylistCapacity = arraylist.capacity();
+		T& arraylistFront = arraylist.front();
+		T& arraylistBack = arraylist.back();
+		size_t arraylistSize = arraylist.size();
+		size_t arraylistCapacity = arraylist.capacity();
 
-		int& vectorlistFront = vector.front();
-		int& vectorlistBack = vector.back();
-		int vectorlistSize = vector.size();
+		T& vectorlistFront = vector.front();
+		T& vectorlistBack = vector.back();
+		size_t vectorlistSize = vector.size();
 		if (arraylist.front() != vector.front() or arraylist.back() != vector.back()
 			or arraylist.size() != vector.size())
 		{
@@ -50,5 +87,11 @@ int main()
 	if (arraylist.size() != vector.size())
 		return 1;
 
+	std::cout << "End of test\n";
 	return 0;
+}
+
+int main()
+{
+	return testContainer<Entity>();
 }
