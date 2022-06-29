@@ -1,6 +1,7 @@
 #!/bin/bash
 
-cmake -G "Unix Makefiles" -S . -B ./build
+cmake -DCMAKE_BUILD_TYPE=Debug -S . -B ./build
 cd ./build
 make
-./blare
+./blare-testing/ArraylistTest
+echo "Exit code of ArraylistTest: $?"
