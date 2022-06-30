@@ -14,6 +14,6 @@ script:
   # Export CC and CXX to tell cmake which compiler to use
   - export CC=gcc-9
   - export CXX=g++-9
-  - cmake .
+  - cmake -DCMAKE_BUILD_TYPE=Debug .
   - cmake --build . -- -j2
-  - ctest -j2
+  - ./blare-testing/ArrayListTest

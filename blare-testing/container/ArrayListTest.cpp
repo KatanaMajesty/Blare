@@ -44,8 +44,12 @@ template<typename T> int testContainer()
 {
 	blare::container::ArrayList<T> arraylist;
 	std::vector<T> vector;
+	srand(time(nullptr));
 
-	for (size_t i = 0; i < 1'000; i++)
+	std::cout << "Starting test\n";
+
+	std::cout << "Entering first loop\n";
+	for (size_t i = 0; i < 1; i++)
 	{
 		size_t randomPushBack = rand() % 10'000 + 10'000;
 		for (size_t j = 0; j < randomPushBack; j++)
@@ -62,6 +66,8 @@ template<typename T> int testContainer()
 			if (!vector.empty()) vector.pop_back();
 		}
 	}
+
+	std::cout << "Finished loop - comparing\n";
 
 	if (arraylist.size() != 0)
 	{
@@ -83,6 +89,8 @@ template<typename T> int testContainer()
 		}
 	}
 
+	std::cout << "Finished comparison loop\n";
+
 	vector.shrink_to_fit();
 	arraylist.compress();
 	if (arraylist.size() != vector.size())
@@ -93,9 +101,9 @@ template<typename T> int testContainer()
 	if (!std::equal(arraylist.begin(), arraylist.end(), otherlist.begin(), otherlist.end()))
 		return 1;
 
-	otherlist = std::move(arraylist);
-	if (arraylist)
-		return 1;
+	// otherlist = std::move(arraylist);
+	// if (arraylist)
+	// 	return 1;
 
 	std::cout << "End of test\n";
 	return 0;

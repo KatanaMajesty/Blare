@@ -45,11 +45,11 @@ namespace blare::container
 				m_Capacity = other.m_Capacity;
 				this->reallocate(m_Capacity);
 			}
+			m_Size = other.m_Size;
+			m_Factor = other.m_Factor;
 			for (ptrdiff_t i = 0; i < m_Size; i++)
 				new((T*)m_Data + i) T(other.at(i));
 
-			m_Size = other.m_Size;
-			m_Factor = other.m_Factor;
 
 			return *this;
 		}
