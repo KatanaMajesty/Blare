@@ -101,9 +101,9 @@ template<typename T> int testContainer()
 	if (!std::equal(arraylist.begin(), arraylist.end(), otherlist.begin(), otherlist.end()))
 		return 1;
 
-	// otherlist = std::move(arraylist);
-	// if (arraylist)
-	// 	return 1;
+	otherlist = std::move(arraylist);
+	if (arraylist)
+		return 1;
 
 	std::cout << "End of test\n";
 	return 0;
