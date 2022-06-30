@@ -1,8 +1,9 @@
-#include "container/Arraylist.h"
+#include "container/ArrayList.h"
 
 #include <vector>
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 class Entity
 {
@@ -85,6 +86,10 @@ template<typename T> int testContainer()
 	vector.shrink_to_fit();
 	arraylist.compress();
 	if (arraylist.size() != vector.size())
+		return 1;
+
+	blare::ArrayList<Entity> otherlist = arraylist;
+	if (!std::equal(arraylist.begin(), arraylist.end(), otherlist.begin(), otherlist.end()))
 		return 1;
 
 	std::cout << "End of test\n";

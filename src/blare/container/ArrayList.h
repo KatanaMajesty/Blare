@@ -2,8 +2,6 @@
 
 #include <cstddef>
 #include <stdexcept>
-#include <cstring>
-#include <iostream>
 
 namespace blare
 {
@@ -12,17 +10,47 @@ namespace blare
 	public:
 		using Iterator = T*;
 	public:
-		explicit ArrayList(size_t initialCapacity = 2, float factor = 1.5f)
+		ArrayList(size_t initialCapacity = 2, float factor = 1.5f)
 			: m_Size(0), m_Factor(factor), m_Capacity(initialCapacity + 1) 
 		{ 
 			if (m_Factor < 1.0f) // for efficiency sake
 				m_Factor = 1.2f;
 			m_Data = (T*)operator new[](m_Capacity * sizeof(T)); 
 		}
-		ArrayList(const ArrayList& other); // noimpl
-		ArrayList(ArrayList&& other); // noimpl
-		ArrayList& operator=(const ArrayList& other); // noimpl
-		ArrayList& operator=(ArrayList&& other); // noimpl
+		ArrayList(const ArrayList& other)
+			: m_Size(other.m_Size), m_Factor(other.m_Factor)
+		{
+			this->clear();
+			if (m_Capacity != other.m_Capacity)
+			{
+				m_Capacity = other.m_Capacity;
+				this->reallocate(m_Capacity);				
+			}
+			for (ptrdiff_t i = 0; i < m_Size; i++)
+				new((T*)m_Data + i) T(other.at(i));
+		}
+		ArrayList(ArrayList&& other)
+			: m_Size(other.m_Size), m_Factor(other.m_Factor)
+		{
+			operator delete[](m_Data, m_Capacity * sizeof(T));
+			m_Data = other.m_Data;
+			m_Capacity = other.m_Capacity;
+
+			other.m_Data = nullptr;
+			other.m_Size = 0;
+			other.m_Factor = 0.0f;
+			other.m_Capacity = 0;
+		}
+		ArrayList& operator=(const ArrayList& other)
+		{
+			if (this == &other)
+				return *this;
+			*this = other;
+		}
+		ArrayList& operator=(ArrayList&& other)
+		{
+			return *this = std::move(other);
+		}
 		~ArrayList() 
 		{ 
 			for (T& t : *this)
@@ -35,21 +63,21 @@ namespace blare
 			if (m_Size >= m_Capacity)
 				reallocate((size_t) (m_Capacity * static_cast<float>(m_Factor) + 1.0f));
 			m_Size++;
-			new(end() - 1) T(t);
+			new(&back()) T(t);
 		}
 		void pushBack(T&& t)
 		{
-			std::cout << "rval pushback\n";
 			if (m_Size >= m_Capacity) 
 				reallocate((size_t) (m_Capacity * static_cast<float>(m_Factor) + 1.0f));
 			m_Size++;
-			new(end() - 1) T(std::move(t));
+			new(&back()) T(std::move(t));
 		}
 		void popBack()
 		{
 			if (m_Size == 0)
 				return;
 
+			at(m_Size - 1).~T();
 			m_Size--;
 			if (m_Size <= (size_t) (m_Capacity / (m_Factor * 2.0f)))
 				reallocate((size_t) (m_Capacity / (m_Factor * 2.0f)));

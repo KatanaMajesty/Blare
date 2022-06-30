@@ -11,6 +11,8 @@ file(GLOB_RECURSE
 	SOURCE "./src/${PROJECT_NAME}/*.cpp"
 )
 
+set_property(GLOBAL PROPERTY CMAKE_CXX_STANDARD ${BLARE_CXX_STD})
+
 if (BLARE_TESTS)
 	enable_testing()
 	add_subdirectory(${BLARE_TESTING_DIR})
