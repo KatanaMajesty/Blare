@@ -2,8 +2,10 @@
 
 #include <cstddef>
 #include <stdexcept>
+#include <iostream>
+#include <algorithm>
 
-namespace blare
+namespace blare::container
 {
 	template<typename T> class ArrayList
 	{
@@ -18,24 +20,15 @@ namespace blare
 			m_Data = (T*)operator new[](m_Capacity * sizeof(T)); 
 		}
 		ArrayList(const ArrayList& other)
-			: m_Size(other.m_Size), m_Factor(other.m_Factor)
+			: m_Size(other.m_Size), m_Factor(other.m_Factor), m_Capacity(other.m_Capacity)
 		{
-			this->clear();
-			if (m_Capacity != other.m_Capacity)
-			{
-				m_Capacity = other.m_Capacity;
-				this->reallocate(m_Capacity);				
-			}
+			m_Data = (T*)operator new[](m_Capacity * sizeof(T)); 
 			for (ptrdiff_t i = 0; i < m_Size; i++)
 				new((T*)m_Data + i) T(other.at(i));
 		}
 		ArrayList(ArrayList&& other)
-			: m_Size(other.m_Size), m_Factor(other.m_Factor)
+			: m_Size(other.m_Size), m_Factor(other.m_Factor), m_Data(other.m_Data), m_Capacity(other.m_Capacity)
 		{
-			operator delete[](m_Data, m_Capacity * sizeof(T));
-			m_Data = other.m_Data;
-			m_Capacity = other.m_Capacity;
-
 			other.m_Data = nullptr;
 			other.m_Size = 0;
 			other.m_Factor = 0.0f;
@@ -45,16 +38,44 @@ namespace blare
 		{
 			if (this == &other)
 				return *this;
-			*this = other;
+
+			this->clear();
+			if (m_Capacity != other.m_Capacity)
+			{
+				m_Capacity = other.m_Capacity;
+				this->reallocate(m_Capacity);
+			}
+			for (ptrdiff_t i = 0; i < m_Size; i++)
+				new((T*)m_Data + i) T(other.at(i));
+
+			m_Size = other.m_Size;
+			m_Factor = other.m_Factor;
+
+			return *this;
 		}
 		ArrayList& operator=(ArrayList&& other)
 		{
-			return *this = std::move(other);
+			for (T& t : *this)
+				t.~T();
+			operator delete[](m_Data, m_Capacity * sizeof(T));
+			m_Data = other.m_Data;
+			m_Size = other.m_Size;
+			m_Factor = other.m_Factor;
+			m_Capacity = other.m_Capacity;
+
+			other.m_Data = nullptr;
+			other.m_Size = 0;
+			other.m_Factor = 0.0f;
+			other.m_Capacity = 0;
+			return *this;
 		}
 		~ArrayList() 
 		{ 
-			for (T& t : *this)
-				t.~T();
+			if (*this)
+			{
+				for (T& t : *this)
+					t.~T();				
+			}
 			operator delete[](m_Data, m_Capacity * sizeof(T)); 
 		}
 
@@ -126,6 +147,8 @@ namespace blare
 		constexpr T* data() noexcept { return m_Data; }
 		constexpr const T* data() const noexcept { return m_Data; }
 		constexpr bool isEmpty() const { return m_Size == 0; }
+
+		operator bool() const { return m_Data; }
 
 	private:
 		void reallocate(size_t capacity)

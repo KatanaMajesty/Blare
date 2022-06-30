@@ -36,13 +36,13 @@ public:
 
 std::ostream& operator<<(std::ostream& stream, const Entity& entity)
 {
-	stream << entity.m_Hash;
+	stream << entity.m_Hash << ": " << entity.m_UUID;
 	return stream;
 }
 
 template<typename T> int testContainer()
 {
-	blare::ArrayList<T> arraylist;
+	blare::container::ArrayList<T> arraylist;
 	std::vector<T> vector;
 
 	for (size_t i = 0; i < 1'000; i++)
@@ -88,8 +88,13 @@ template<typename T> int testContainer()
 	if (arraylist.size() != vector.size())
 		return 1;
 
-	blare::ArrayList<Entity> otherlist = arraylist;
+	blare::container::ArrayList<Entity> otherlist = arraylist;
+	arraylist = otherlist;
 	if (!std::equal(arraylist.begin(), arraylist.end(), otherlist.begin(), otherlist.end()))
+		return 1;
+
+	otherlist = std::move(arraylist);
+	if (arraylist)
 		return 1;
 
 	std::cout << "End of test\n";
