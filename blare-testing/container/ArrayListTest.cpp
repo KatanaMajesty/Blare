@@ -49,7 +49,7 @@ template<typename T> int testContainer()
 	std::cout << "Starting test\n";
 
 	std::cout << "Entering first loop\n";
-	for (size_t i = 0; i < 1; i++)
+	for (size_t i = 0; i < 1'000; i++)
 	{
 		size_t randomPushBack = rand() % 10'000 + 10'000;
 		for (size_t j = 0; j < randomPushBack; j++)
