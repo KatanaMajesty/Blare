@@ -14,8 +14,8 @@ namespace blare::container
 {
 	template<typename T, std::size_t N> struct ArrayTraits
 	{
-		typedef T array_type[N];
 		using value_type = T;
+		using array_type = value_type[N];
 		using is_swappable = std::is_swappable<value_type>;
 		using is_nothrow_swappable = std::is_nothrow_swappable<value_type>;
 

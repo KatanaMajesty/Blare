@@ -1,4 +1,4 @@
-#include "container/ArrayList.h"
+#include "container/ArrayList.hxx"
 
 #include <vector>
 #include <iostream>
@@ -54,7 +54,6 @@ template<typename T> int testContainer()
 		size_t randomPushBack = rand() % 10'000 + 10'000;
 		for (size_t j = 0; j < randomPushBack; j++)
 		{
-			// size_t randomNum = rand() % 20'000;
 			Entity entity;
 			arraylist.pushBack(entity);
 			vector.push_back(entity);
