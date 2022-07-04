@@ -86,10 +86,8 @@ namespace blare::container
 		constexpr reference back() { return *(end() - 1); }
 		constexpr const_reference back() const { return *(end() - 1); }
 
-		// constexpr reference operator[](size_t index) { return traits_type::ref(m_Data, index); }
-		constexpr reference operator[](size_t index) { return m_Data[index]; }
-		constexpr const_reference operator[](size_t index) const { return m_Data[index]; }
-		// constexpr const_reference operator[](size_t index) const { return const_cast<const_reference>(traits_type::ref(m_Data, index)); }
+		constexpr reference operator[](size_t index) { return traits_type::ref(m_Data, index); }
+		constexpr const_reference operator[](size_t index) const { return const_cast<const_reference>(traits_type::ref(m_Data, index)); }
 
 		constexpr reference at(size_t index)
 		{
