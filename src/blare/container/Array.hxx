@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <type_traits>
 
+// To be moved away
 #ifdef NDEBUG
 	#define INDEXED_ACCESS_GUARD(i, sz, expression)
 #else 
